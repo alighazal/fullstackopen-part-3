@@ -69,9 +69,16 @@ app.post('/api/persons', (req, res) => {
   
     if (!body.name || !body.number ) {
       return res.status(400).json({ 
-        error: 'content missing' 
+        error: 'The name or number is missing' 
       })
     }
+
+    const repeatedEntry = phonebook_entries.find( entry => entry.name == body.name  )
+    if ( repeatedEntry !== undefined )
+        return res.status(400).json({ 
+        error: 'name must be unique' 
+      })
+
   
     const entry = {
         id: generateId(),
