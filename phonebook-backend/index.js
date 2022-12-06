@@ -1,5 +1,7 @@
 const express = require('express')
 const app = express()
+app.use(express.json())
+
 
 let phonebook_entries = [
     { 
@@ -36,11 +38,20 @@ app.get('/api/persons/:id', (req, res) => {
     for (let i = 0; i < phonebook_entries.length; i++ )
     {
         if ( phonebook_entries[i].id == id )
-            res.send(phonebook_entries[i]) 
+            {
+                res.send(phonebook_entries[i])
+                return;
+        }
     }
-
     res.status(404).send({ error: 'entry not found' })
 })
+
+
+app.delete('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+    phonebook_entries = phonebook_entries.filter(phonebook_entry => phonebook_entry.id !== id)
+    res.status(204).end()
+  })
 
 app.get('/info', (req, res) => {
     res.send( `<div>
