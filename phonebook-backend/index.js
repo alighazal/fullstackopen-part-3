@@ -60,6 +60,29 @@ app.get('/info', (req, res) => {
     </div>`  )
 })
 
+const generateId = () => {
+    return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+}
+
+app.post('/api/persons', (req, res) => {
+    const body = req.body
+  
+    if (!body.name || !body.number ) {
+      return res.status(400).json({ 
+        error: 'content missing' 
+      })
+    }
+  
+    const entry = {
+        id: generateId(),
+        number: body.number,
+        name: body.name,
+    }
+  
+    phonebook_entries = phonebook_entries.concat(entry)
+    res.json(entry)
+})
+
 
   
 const PORT = 3001
