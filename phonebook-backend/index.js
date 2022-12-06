@@ -30,6 +30,18 @@ app.get('/api/persons', (req, res) => {
     res.send(phonebook_entries)
 })
 
+app.get('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+
+    for (let i = 0; i < phonebook_entries.length; i++ )
+    {
+        if ( phonebook_entries[i].id == id )
+            res.send(phonebook_entries[i]) 
+    }
+
+    res.status(404).send({ error: 'entry not found' })
+})
+
 app.get('/info', (req, res) => {
     res.send( `<div>
         <p> Phonebook has info for ${ phonebook_entries.length } people </p>
