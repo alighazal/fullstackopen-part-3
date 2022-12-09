@@ -1,7 +1,12 @@
+require('dotenv').config()
+
 const express = require('express')
 const app = express()
-var morgan = require('morgan')
+const morgan = require('morgan')
 const cors = require('cors')
+
+
+const Person = require('./models/person')
 
 app.use(cors())
 app.use(express.json())
@@ -41,21 +46,19 @@ let phonebook_entries = [
 app.use(express.json())
 
 app.get('/api/persons', (req, res) => {
-    res.send(phonebook_entries)
+  Person.find({}).then(result => {
+    return res.json(result)
+  })
 })
 
 app.get('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
+    const id = String(req.params.id)
 
-    for (let i = 0; i < phonebook_entries.length; i++ )
-    {
-        if ( phonebook_entries[i].id == id )
-            {
-                res.send(phonebook_entries[i])
-                return;
-        }
-    }
-    res.status(404).send({ error: 'entry not found' })
+    Person.find({"_id": id}).then(result => {
+      return res.json(result)
+    })
+
+    // res.status(404).send({ error: 'entry not found' })
 })
 
 
@@ -85,21 +88,19 @@ app.post('/api/persons', (req, res) => {
       })
     }
 
-    const repeatedEntry = phonebook_entries.find( entry => entry.name == body.name  )
-    if ( repeatedEntry !== undefined )
-        return res.status(400).json({ 
-        error: 'name must be unique' 
-      })
+    // const repeatedEntry = phonebook_entries.find( entry => entry.name == body.name  )
+    // if ( repeatedEntry !== undefined )
+    //     return res.status(400).json({ 
+    //     error: 'name must be unique' 
+    //   })
 
   
-    const entry = {
-        id: generateId(),
+    const person = new Person( {
         number: body.number,
         name: body.name,
-    }
+    })
   
-    phonebook_entries = phonebook_entries.concat(entry)
-    res.json(entry)
+    res.json(person.save())
 })
 
 app.use(express.static('build'))
