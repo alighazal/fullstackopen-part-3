@@ -83,7 +83,7 @@ const generateId = () => {
     return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 }
 
-app.post('/api/persons', (req, res)  =>  {
+app.post('/api/persons', async (req, res)  =>  {
     const body = req.body
   
     if (!body.name || !body.number ) {
@@ -98,7 +98,7 @@ app.post('/api/persons', (req, res)  =>  {
     })
 
     person.save().then( savedPerson => {
-      res.json(savedPerson)
+      res.json(newPerson)
     } )
     
 })
@@ -108,11 +108,6 @@ app.use(express.static('build'))
 
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
-
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
-  } 
-
   next(error)
 }
 
