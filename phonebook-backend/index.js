@@ -62,10 +62,14 @@ app.get('/api/persons/:id', (req, res) => {
 })
 
 
-app.delete('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    phonebook_entries = phonebook_entries.filter(phonebook_entry => phonebook_entry.id !== id)
-    res.status(204).end()
+app.delete('/api/persons/:id', (req, res, next) => {
+    const id = String(req.params.id)
+
+    Person.findByIdAndRemove(id)
+    .then(result => {
+      res.status(204).end()
+    })
+    .catch(error => next(error))
   })
 
 app.get('/info', (req, res) => {
@@ -79,7 +83,7 @@ const generateId = () => {
     return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 }
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res)  =>  {
     const body = req.body
   
     if (!body.name || !body.number ) {
@@ -87,23 +91,32 @@ app.post('/api/persons', (req, res) => {
         error: 'The name or number is missing' 
       })
     }
-
-    // const repeatedEntry = phonebook_entries.find( entry => entry.name == body.name  )
-    // if ( repeatedEntry !== undefined )
-    //     return res.status(400).json({ 
-    //     error: 'name must be unique' 
-    //   })
-
   
     const person = new Person( {
         number: body.number,
         name: body.name,
     })
-  
-    res.json(person.save())
+
+    person.save().then( savedPerson => {
+      res.json(savedPerson)
+    } )
+    
 })
 
 app.use(express.static('build'))
+
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+app.use(errorHandler)
 
   
 const PORT = process.env.PORT || "8080";
