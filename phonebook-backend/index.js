@@ -79,11 +79,7 @@ app.get('/info', (req, res) => {
     </div>`  )
 })
 
-const generateId = () => {
-    return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
-}
-
-app.post('/api/persons', async (req, res)  =>  {
+app.post('/api/persons/', (req, res)  =>  {
     const body = req.body
   
     if (!body.name || !body.number ) {
@@ -98,9 +94,32 @@ app.post('/api/persons', async (req, res)  =>  {
     })
 
     person.save().then( savedPerson => {
-      res.json(newPerson)
+      res.json(savedPerson)
     } )
     
+})
+
+app.put('/api/persons/:id', (req, res, next)  =>  {
+  const body = req.body
+  const id = String(req.params.id)
+
+  if (!body.name || !body.number ) {
+    return res.status(400).json({ 
+      error: 'The name or number is missing' 
+    })
+  }
+
+  const person = {
+      number: body.number,
+      name: body.name,
+  }
+
+  Person.findByIdAndUpdate(id, person, { new: true })
+    .then(updatedPerson => {
+      res.json(updatedPerson)
+    })
+  .catch(error => next(error))
+  
 })
 
 app.use(express.static('build'))
