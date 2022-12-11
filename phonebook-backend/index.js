@@ -73,10 +73,17 @@ app.delete('/api/persons/:id', (req, res, next) => {
   })
 
 app.get('/info', (req, res) => {
-    res.send( `<div>
-        <p> Phonebook has info for ${ phonebook_entries.length } people </p>
+
+    Person.count({}, function( err, count){
+      console.log( "Number of users:", count );
+      res.send( `<div>
+        <p> Phonebook has info for ${ count } people </p>
         <p> ${Date().toString()}  </p>
-    </div>`  )
+      </div>`  )
+    })
+
+
+    
 })
 
 app.post('/api/persons/', (req, res)  =>  {
